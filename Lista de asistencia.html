@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Christmas Dinner RSVP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .rsvp {
+      margin-bottom: 10px;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎄 Christmas Dinner RSVP</h1>
+  <label for="name">Your Name:</label>
+  <input type="text" id="name" placeholder="Enter your name">
+  <div class="rsvp">
+    <input type="radio" name="attendance" value="yes" id="yes">
+    <label for="yes">Yes, I'm coming!</label><br>
+    <input type="radio" name="attendance" value="no" id="no">
+    <label for="no">No, can't make it</label>
+  </div>
+  <button onclick="submitRSVP()">Submit</button>
+
+  <h2>Current Responses:</h2>
+  <ul id="responses"></ul>
+
+  <script>
+    let rsvpList = JSON.parse(localStorage.getItem("rsvps")) || [];
+
+    function submitRSVP() {
+      const name = document.getElementById("name").value.trim();
+      const attendance = document.querySelector('input[name="attendance"]:checked');
+
+      if (!name || !attendance) {
+        alert("Please enter your name and select an option.");
+        return;
+      }
+
+      // Add or update RSVP
+      const existing = rsvpList.find(r => r.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.attending = attendance.value === "yes";
+      } else {
+        rsvpList.push({ name, attending: attendance.value === "yes" });
+      }
+
+      // Save to localStorage
+      localStorage.setItem("rsvps", JSON.stringify(rsvpList));
+      displayResponses();
+      document.getElementById("name").value = "";
+      document.querySelector('input[name="attendance"]:checked').checked = false;
+    }
+
+    function displayResponses() {
+      const list = document.getElementById("responses");
+      list.innerHTML = "";
+      rsvpList.forEach(rsvp => {
+        const li = document.createElement("li");
+        li.textContent = `${rsvp.name} - ${rsvp.attending ? "✅ Coming" : "❌ Not coming"}`;
+        list.appendChild(li);
+      });
+    }
+
+    displayResponses();
+  </script>
+</body>
+</html>
