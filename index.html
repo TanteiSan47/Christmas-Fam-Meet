@@ -66,6 +66,8 @@
   <script>
     let rsvpList = JSON.parse(localStorage.getItem("rsvps")) || [];
     let currentLang = "en";
+    let isAdmin = false;  // Initial state, user is not admin
+    const adminPassword = "Enter126"; // Admin password for basic protection
 
     const translations = {
       en: {
@@ -79,7 +81,6 @@
         coming: "✅ Coming",
         notComing: "❌ Not coming",
         switchLang: "Español",
-        alert: "Please enter your name and select an option."
       },
       es: {
         title: "🎄 Confirmación para la Cena de Navidad",
@@ -92,7 +93,6 @@
         coming: "✅ Asistirá",
         notComing: "❌ No asistirá",
         switchLang: "English",
-        alert: "Por favor escribe tu nombre y selecciona una opción."
       }
     };
 
@@ -115,7 +115,7 @@
       const attendance = document.querySelector('input[name="attendance"]:checked');
 
       if (!name || !attendance) {
-        alert(translations[currentLang].alert);
+        alert("Please enter your name and select an option.");
         return;
       }
 
@@ -136,11 +136,34 @@
       const list = document.getElementById("responses");
       list.innerHTML = "";
       const t = translations[currentLang];
-      rsvpList.forEach(rsvp => {
+      rsvpList.forEach((rsvp, index) => {
         const li = document.createElement("li");
         li.textContent = `${rsvp.name} - ${rsvp.attending ? t.coming : t.notComing}`;
+        
+        // Only show delete button if the user is admin
+        if (isAdmin) {
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Delete";
+          deleteButton.onclick = () => deleteRSVP(index);
+          li.appendChild(deleteButton);
+        }
+
         list.appendChild(li);
       });
+    }
+
+    function deleteRSVP(index) {
+      // Prompt for admin password before allowing deletion
+      const password = prompt("Please enter the admin password to delete this RSVP:");
+
+      if (password === adminPassword) {
+        rsvpList.splice(index, 1);
+        localStorage.setItem("rsvps", JSON.stringify(rsvpList));
+        displayResponses();
+        alert("RSVP deleted!");
+      } else {
+        alert("Incorrect password. You cannot delete this RSVP.");
+      }
     }
 
     displayResponses();
