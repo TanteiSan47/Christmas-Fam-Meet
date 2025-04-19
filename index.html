@@ -75,3 +75,76 @@
         yesLabel: "Yes, I'm coming!",
         noLabel: "No, can't make it",
         submit: "Submit",
+        responsesTitle: "Current Responses:",
+        coming: "✅ Coming",
+        notComing: "❌ Not coming",
+        switchLang: "Español",
+        alert: "Please enter your name and select an option."
+      },
+      es: {
+        title: "🎄 Confirmación para la Cena de Navidad",
+        nameLabel: "Tu nombre:",
+        namePlaceholder: "Escribe tu nombre",
+        yesLabel: "¡Sí voy!",
+        noLabel: "No puedo ir",
+        submit: "Enviar",
+        responsesTitle: "Respuestas actuales:",
+        coming: "✅ Asistirá",
+        notComing: "❌ No asistirá",
+        switchLang: "English",
+        alert: "Por favor escribe tu nombre y selecciona una opción."
+      }
+    };
+
+    function switchLanguage() {
+      currentLang = currentLang === "en" ? "es" : "en";
+      const t = translations[currentLang];
+      document.getElementById("title").textContent = t.title;
+      document.getElementById("label-name").textContent = t.nameLabel;
+      document.getElementById("name").placeholder = t.namePlaceholder;
+      document.getElementById("label-yes").textContent = t.yesLabel;
+      document.getElementById("label-no").textContent = t.noLabel;
+      document.getElementById("submit-button").textContent = t.submit;
+      document.getElementById("responses-title").textContent = t.responsesTitle;
+      document.querySelector(".lang-switch button").textContent = t.switchLang;
+      displayResponses();
+    }
+
+    function submitRSVP() {
+      const name = document.getElementById("name").value.trim();
+      const attendance = document.querySelector('input[name="attendance"]:checked');
+
+      if (!name || !attendance) {
+        alert(translations[currentLang].alert);
+        return;
+      }
+
+      const existing = rsvpList.find(r => r.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.attending = attendance.value === "yes";
+      } else {
+        rsvpList.push({ name, attending: attendance.value === "yes" });
+      }
+
+      localStorage.setItem("rsvps", JSON.stringify(rsvpList));
+      displayResponses();
+      document.getElementById("name").value = "";
+      document.querySelector('input[name="attendance"]:checked').checked = false;
+    }
+
+    function displayResponses() {
+      const list = document.getElementById("responses");
+      list.innerHTML = "";
+      const t = translations[currentLang];
+      rsvpList.forEach(rsvp => {
+        const li = document.createElement("li");
+        li.textContent = `${rsvp.name} - ${rsvp.attending ? t.coming : t.notComing}`;
+        list.appendChild(li);
+      });
+    }
+
+    displayResponses();
+  </script>
+
+</body>
+</html>
