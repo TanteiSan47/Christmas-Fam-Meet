@@ -3,51 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Christmas Family RSVP</title>
-  <!-- Add Firebase scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f3f3f3;
-    }
-    #rsvp-buttons {
-      margin-top: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #response-count {
-      margin-top: 20px;
-    }
-  </style>
+  <title>Christmas Dinner RSVP</title>
+  <!-- Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>
 </head>
 <body>
-  <h1>Christmas Family RSVP</h1>
 
-  <!-- RSVP Form -->
-  <form id="rsvp-form">
-    <label for="name">Your Name:</label>
-    <input type="text" id="name" name="name" required>
+  <h1>Christmas Dinner RSVP</h1>
 
-    <div id="rsvp-buttons">
-      <button type="button" id="yes-btn">Yes</button>
-      <button type="button" id="no-btn">No</button>
-    </div>
-  </form>
+  <!-- Form for submitting RSVP -->
+  <label for="name">Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" required><br>
 
-  <div id="response-count">
-    <p>Total Responses: <span id="total-responses">0</span></p>
-  </div>
+  <button id="yes-btn">Yes, I'll attend</button>
+  <button id="no-btn">No, I can't attend</button>
 
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDOejLrqz
+  <!-- Display total responses count -->
+  <p>Total Responses: <span id="total-responses">0</span></p>
+
+  <!-- Section to display the list of attendees -->
+  <div id="attendees-list">
+    <h2>Attendees:</h2>
+    <ul
