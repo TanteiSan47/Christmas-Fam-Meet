@@ -1,173 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Christmas Dinner RSVP</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cena de Navidad Familiar</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: url('https://images.unsplash.com/photo-1608889175282-30c76c71c3d1') center/cover no-repeat;
-      background-attachment: fixed;
-      color: white;
-      text-shadow: 1px 1px 3px black;
+      background: #f2f2f2;
+      max-width: 600px;
+      margin: auto;
     }
-    .form {
-      background-color: rgba(0,0,0,0.6);
+    h1 {
+      color: #2e3b4e;
+      text-align: center;
+    }
+    form {
+      background: white;
       padding: 20px;
-      border-radius: 10px;
-      max-width: 400px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin: 12px 0 4px;
     }
     input[type="text"] {
       width: 100%;
       padding: 8px;
-      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .attendance-options {
+      margin: 12px 0;
+    }
+    .attendance-options input {
+      margin-right: 5px;
     }
     button {
-      margin-top: 10px;
-      padding: 10px;
-      border: none;
-      background: #4CAF50;
+      background: #2e8b57;
       color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
+      margin-top: 10px;
     }
-    ul {
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 10px;
-      border-radius: 10px;
-    }
-    .lang-switch {
-      margin-bottom: 20px;
+    button:hover {
+      background: #256d47;
     }
   </style>
 </head>
 <body>
+  <h1>RSVP - Cena de Navidad Familiar 🎄</h1>
 
-  <div class="lang-switch">
-    <button onclick="switchLanguage()">Español</button>
-  </div>
+  <form id="rsvp-form">
+    <label for="name">Tu nombre:</label>
+    <input type="text" id="name" required />
 
-  <div class="form">
-    <h1 id="title">🎄 Christmas Dinner RSVP</h1>
-    <label id="label-name" for="name">Your Name:</label>
-    <input type="text" id="name" placeholder="Enter your name">
-    <div>
-      <input type="radio" name="attendance" value="yes" id="yes">
-      <label id="label-yes" for="yes">Yes, I'm coming!</label><br>
-      <input type="radio" name="attendance" value="no" id="no">
-      <label id="label-no" for="no">No, can't make it</label>
+    <div class="attendance-options">
+      <label>
+        <input type="radio" name="attendance" value="yes" /> Sí asistiré
+      </label>
+      <label>
+        <input type="radio" name="attendance" value="no" /> No podré asistir
+      </label>
     </div>
-    <button onclick="submitRSVP()" id="submit-button">Submit</button>
-  </div>
 
-  <h2 id="responses-title">Current Responses:</h2>
-  <ul id="responses"></ul>
+    <button type="submit">Enviar Confirmación</button>
+  </form>
 
-  <script>
-    let rsvpList = JSON.parse(localStorage.getItem("rsvps")) || [];
-    let currentLang = "en";
-    let isAdmin = true;  // Initial state, user is not admin
-    const adminPassword = "Enter126"; // Admin password for basic protection
+  <!-- Firebase RSVP Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
-    const translations = {
-      en: {
-        title: "🎄 Christmas Dinner RSVP",
-        nameLabel: "Your Name:",
-        namePlaceholder: "Enter your name",
-        yesLabel: "Yes, I'm coming!",
-        noLabel: "No, can't make it",
-        submit: "Submit",
-        responsesTitle: "Current Responses:",
-        coming: "✅ Coming",
-        notComing: "❌ Not coming",
-        switchLang: "Español",
-      },
-      es: {
-        title: "🎄 Confirmación para la Cena de Navidad",
-        nameLabel: "Tu nombre:",
-        namePlaceholder: "Escribe tu nombre",
-        yesLabel: "¡Sí voy!",
-        noLabel: "No puedo ir",
-        submit: "Enviar",
-        responsesTitle: "Respuestas actuales:",
-        coming: "✅ Asistirá",
-        notComing: "❌ No asistirá",
-        switchLang: "English",
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDOejLrqz6iXfgB7b6s2jeMU9v7ixGfmIY",
+      authDomain: "christmas-rsvp-89094.firebaseapp.com",
+      projectId: "christmas-rsvp-89094",
+      storageBucket: "christmas-rsvp-89094.firebasestorage.app",
+      messagingSenderId: "860918827789",
+      appId: "1:860918827789:web:d465fc912ce8a919d03e44"
     };
 
-    function switchLanguage() {
-      currentLang = currentLang === "en" ? "es" : "en";
-      const t = translations[currentLang];
-      document.getElementById("title").textContent = t.title;
-      document.getElementById("label-name").textContent = t.nameLabel;
-      document.getElementById("name").placeholder = t.namePlaceholder;
-      document.getElementById("label-yes").textContent = t.yesLabel;
-      document.getElementById("label-no").textContent = t.noLabel;
-      document.getElementById("submit-button").textContent = t.submit;
-      document.getElementById("responses-title").textContent = t.responsesTitle;
-      document.querySelector(".lang-switch button").textContent = t.switchLang;
-      displayResponses();
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    function submitRSVP() {
+    document.getElementById("rsvp-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
       const name = document.getElementById("name").value.trim();
-      const attendance = document.querySelector('input[name="attendance"]:checked');
+      const attendance = document.querySelector("input[name='attendance']:checked")?.value;
 
       if (!name || !attendance) {
-        alert("Please enter your name and select an option.");
+        alert("Por favor escribe tu nombre y selecciona si vas a asistir.");
         return;
       }
 
-      const existing = rsvpList.find(r => r.name.toLowerCase() === name.toLowerCase());
-      if (existing) {
-        existing.attending = attendance.value === "yes";
-      } else {
-        rsvpList.push({ name, attending: attendance.value === "yes" });
+      try {
+        await addDoc(collection(db, "submissions"), {
+          name,
+          attendance,
+          timestamp: new Date()
+        });
+
+        alert("¡Tu confirmación fue enviada!");
+        document.getElementById("rsvp-form").reset();
+      } catch (error) {
+        console.error("Error al enviar confirmación:", error);
+        alert("Hubo un error al enviar tu confirmación.");
       }
-
-      localStorage.setItem("rsvps", JSON.stringify(rsvpList));
-      displayResponses();
-      document.getElementById("name").value = "";
-      document.querySelector('input[name="attendance"]:checked').checked = false;
-    }
-
-    function displayResponses() {
-      const list = document.getElementById("responses");
-      list.innerHTML = "";
-      const t = translations[currentLang];
-      rsvpList.forEach((rsvp, index) => {
-        const li = document.createElement("li");
-        li.textContent = `${rsvp.name} - ${rsvp.attending ? t.coming : t.notComing}`;
-        
-        // Only show delete button if the user is admin
-        if (isAdmin) {
-          const deleteButton = document.createElement("button");
-          deleteButton.textContent = "Delete";
-          deleteButton.onclick = () => deleteRSVP(index);
-          li.appendChild(deleteButton);
-        }
-
-        list.appendChild(li);
-      });
-    }
-
-    function deleteRSVP(index) {
-      // Prompt for admin password before allowing deletion
-      const password = prompt("Please enter the admin password to delete this RSVP:");
-
-      if (password === adminPassword) {
-        rsvpList.splice(index, 1);
-        localStorage.setItem("rsvps", JSON.stringify(rsvpList));
-        displayResponses();
-        alert("RSVP deleted!");
-      } else {
-        alert("Incorrect password. You cannot delete this RSVP.");
-      }
-    }
-
-    displayResponses();
+    });
   </script>
-
 </body>
 </html>
