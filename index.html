@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-  <h1>RSVP - Cena de Navidad Familiar 🎄</h1>
+  <h1 id="header-text">RSVP - Cena de Navidad Familiar 🎄</h1>
 
   <form id="rsvp-form">
     <label for="name">Tu nombre:</label>
@@ -71,11 +71,15 @@
     <button type="submit">Enviar Confirmación</button>
   </form>
 
+  <button id="language-toggle">Change Language</button>
+
   <!-- Firebase RSVP Script -->
   <script type="module">
+    // Import Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDOejLrqz6iXfgB7b6s2jeMU9v7ixGfmIY",
       authDomain: "christmas-rsvp-89094.firebaseapp.com",
@@ -85,9 +89,11 @@
       appId: "1:860918827789:web:d465fc912ce8a919d03e44"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Handle form submission
     document.getElementById("rsvp-form").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -111,6 +117,29 @@
       } catch (error) {
         console.error("Error al enviar confirmación:", error);
         alert("Hubo un error al enviar tu confirmación.");
+      }
+    });
+
+    // Language Toggle
+    document.getElementById("language-toggle").addEventListener("click", () => {
+      const isSpanish = document.documentElement.lang === "es";
+      
+      if (isSpanish) {
+        document.documentElement.lang = "en";
+        document.getElementById("header-text").textContent = "Christmas Family Dinner RSVP 🎄";
+        document.querySelector("label[for='name']").textContent = "Your Name:";
+        document.querySelector("button[type='submit']").textContent = "Send Confirmation";
+        document.querySelector(".attendance-options label:nth-child(1)").textContent = "I will attend";
+        document.querySelector(".attendance-options label:nth-child(2)").textContent = "I cannot attend";
+        document.getElementById("language-toggle").textContent = "Cambiar idioma";
+      } else {
+        document.documentElement.lang = "es";
+        document.getElementById("header-text").textContent = "RSVP - Cena de Navidad Familiar 🎄";
+        document.querySelector("label[for='name']").textContent = "Tu nombre:";
+        document.querySelector("button[type='submit']").textContent = "Enviar Confirmación";
+        document.querySelector(".attendance-options label:nth-child(1)").textContent = "Sí asistiré";
+        document.querySelector(".attendance-options label:nth-child(2)").textContent = "No podré asistir";
+        document.getElementById("language-toggle").textContent = "Change Language";
       }
     });
   </script>
