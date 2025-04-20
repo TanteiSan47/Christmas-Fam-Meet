@@ -1,147 +1,53 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cena de Navidad Familiar</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christmas Family RSVP</title>
+  <!-- Add Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
       padding: 20px;
-      background: #f2f2f2;
-      max-width: 600px;
-      margin: auto;
+      background-color: #f3f3f3;
     }
-    h1 {
-      color: #2e3b4e;
-      text-align: center;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin: 12px 0 4px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .attendance-options {
-      margin: 12px 0;
-    }
-    .attendance-options input {
-      margin-right: 5px;
+    #rsvp-buttons {
+      margin-top: 20px;
     }
     button {
-      background: #2e8b57;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
       cursor: pointer;
-      margin-top: 10px;
     }
-    button:hover {
-      background: #256d47;
+    #response-count {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1 id="header-text">RSVP - Cena de Navidad Familiar 🎄</h1>
+  <h1>Christmas Family RSVP</h1>
 
+  <!-- RSVP Form -->
   <form id="rsvp-form">
-    <label for="name">Tu nombre:</label>
-    <input type="text" id="name" required />
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" name="name" required>
 
-    <div class="attendance-options">
-      <label>
-        <input type="radio" name="attendance" value="yes" /> Sí asistiré
-      </label>
-      <label>
-        <input type="radio" name="attendance" value="no" /> No podré asistir
-      </label>
+    <div id="rsvp-buttons">
+      <button type="button" id="yes-btn">Yes</button>
+      <button type="button" id="no-btn">No</button>
     </div>
-
-    <button type="submit">Enviar Confirmación</button>
   </form>
 
-  <button id="language-toggle">Change Language</button>
+  <div id="response-count">
+    <p>Total Responses: <span id="total-responses">0</span></p>
+  </div>
 
-  <!-- Firebase RSVP Script -->
-  <script type="module">
-    // Import Firebase SDKs
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
-
-    // Firebase config
+  <script>
+    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyDOejLrqz6iXfgB7b6s2jeMU9v7ixGfmIY",
-      authDomain: "christmas-rsvp-89094.firebaseapp.com",
-      projectId: "christmas-rsvp-89094",
-      storageBucket: "christmas-rsvp-89094.firebasestorage.app",
-      messagingSenderId: "860918827789",
-      appId: "1:860918827789:web:d465fc912ce8a919d03e44"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Handle form submission
-    document.getElementById("rsvp-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const attendance = document.querySelector("input[name='attendance']:checked")?.value;
-
-      if (!name || !attendance) {
-        alert("Por favor escribe tu nombre y selecciona si vas a asistir.");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "submissions"), {
-          name,
-          attendance,
-          timestamp: new Date()
-        });
-
-        alert("¡Tu confirmación fue enviada!");
-        document.getElementById("rsvp-form").reset();
-      } catch (error) {
-        console.error("Error al enviar confirmación:", error);
-        alert("Hubo un error al enviar tu confirmación.");
-      }
-    });
-
-    // Language Toggle
-    document.getElementById("language-toggle").addEventListener("click", () => {
-      const isSpanish = document.documentElement.lang === "es";
-      
-      if (isSpanish) {
-        document.documentElement.lang = "en";
-        document.getElementById("header-text").textContent = "Christmas Family Dinner RSVP 🎄";
-        document.querySelector("label[for='name']").textContent = "Your Name:";
-        document.querySelector("button[type='submit']").textContent = "Send Confirmation";
-        document.querySelector(".attendance-options label:nth-child(1)").textContent = "I will attend";
-        document.querySelector(".attendance-options label:nth-child(2)").textContent = "I cannot attend";
-        document.getElementById("language-toggle").textContent = "Cambiar idioma";
-      } else {
-        document.documentElement.lang = "es";
-        document.getElementById("header-text").textContent = "RSVP - Cena de Navidad Familiar 🎄";
-        document.querySelector("label[for='name']").textContent = "Tu nombre:";
-        document.querySelector("button[type='submit']").textContent = "Enviar Confirmación";
-        document.querySelector(".attendance-options label:nth-child(1)").textContent = "Sí asistiré";
-        document.querySelector(".attendance-options label:nth-child(2)").textContent = "No podré asistir";
-        document.getElementById("language-toggle").textContent = "Change Language";
-      }
-    });
-  </script>
-</body>
-</html>
+      apiKey: "AIzaSyDOejLrqz
